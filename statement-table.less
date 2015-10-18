@@ -1,0 +1,63 @@
+@acct-indent: 10px;
+@lighten-level: 20%;
+@bgcolor-alternate: 5%;
+@acct-levels: 6;
+
+.make-acct-type(@bgcolor) {
+    .acct-level-color(@l) when (@l > 0) {
+        .acct-level-color((@l - 1));
+        @light: (@l - 1) * @lighten-level;
+        &.acct-level-@{l} {
+            &:nth-child(odd) {
+                background-color: lighten(@bgcolor, @light);
+            }
+            &:nth-child(even) {
+                background-color: lighten(@bgcolor, @light + @bgcolor-alternate);
+            }
+        }
+    }
+    .acct-level-color(@acct-levels);
+}
+
+
+.acct-level-indent(@l) when (@l > 0) {
+    .acct-level-indent((@l - 1));
+    tr.acct-level-@{l} td.acct-name {
+        padding-left: @l * @acct-indent;
+    }
+}    
+.acct-level-indent(@acct-levels);
+
+body {
+    font-size: 14px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+td {
+    vertical-align: top;
+    padding: 1px 5px;
+}
+
+tr.acct-placeholder {
+  font-weight: bold;
+}
+
+tr.acct-cat-asset {
+    .make-acct-type(hsl(240, 20%, 40%));
+}
+tr.acct-cat-liability {
+    .make-acct-type(hsl(60, 100%, 20%));
+}
+tr.acct-cat-income {
+    .make-acct-type(hsl(120, 80%, 20%));
+}
+tr.acct-cat-expense {
+    .make-acct-type(hsl(0, 20%, 30%));
+}
+
+.splits {
+    display: none;
+}
