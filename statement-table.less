@@ -1,6 +1,6 @@
 @acct-indent: 10px;
 @lighten-level: 20%;
-@bgcolor-alternate: 5%;
+@bgcolor-alternate: 7%;
 @acct-levels: 6;
 
 .make-acct-type(@bgcolor) {
@@ -8,10 +8,10 @@
         .acct-level-color((@l - 1));
         @light: (@l - 1) * @lighten-level;
         &.acct-level-@{l} {
-            &:nth-child(odd) {
+            &:nth-of-type(odd) {
                 background-color: lighten(@bgcolor, @light);
             }
-            &:nth-child(even) {
+            &:nth-of-type(even) {
                 background-color: lighten(@bgcolor, @light + @bgcolor-alternate);
             }
         }
@@ -46,13 +46,13 @@ tr.acct-placeholder {
 }
 
 tr.acct-cat-asset {
-    .make-acct-type(hsl(240, 20%, 40%));
+    .make-acct-type(hsl(240, 20%, 45%));
 }
 tr.acct-cat-liability {
-    .make-acct-type(hsl(60, 100%, 20%));
+    .make-acct-type(hsl(60, 70%, 30%));
 }
 tr.acct-cat-income {
-    .make-acct-type(hsl(120, 80%, 20%));
+    .make-acct-type(hsl(120, 60%, 30%));
 }
 tr.acct-cat-expense {
     .make-acct-type(hsl(0, 20%, 30%));

@@ -76,26 +76,28 @@
            ;; The list of accounts. Equiety and the base-account plus account
            ;; types I have no idea how to handle correctly are excluded.
            [accounts (filter (lambda (a)
-                                  (not (or (null? a)
-                                           (member (xaccAccountGetType a)
-                                                   (list ACCT-TYPE-EQUITY
-                                                         ACCT-TYPE-TRADING
-                                                         ACCT-TYPE-NONE))
-                                           (equal? (gncAccountGetGUID a)
-                                                   base-account-guid))))
-                                (gnc-account-get-descendants-sorted
-                                 (gnc-get-current-root-account)))]
+                               (not (or (null? a)
+                                        (member (xaccAccountGetType a)
+                                                (list ACCT-TYPE-EQUITY
+                                                      ACCT-TYPE-TRADING
+                                                      ACCT-TYPE-NONE))
+                                        (equal? (gncAccountGetGUID a)
+                                                base-account-guid))))
+                             (gnc-account-get-descendants-sorted
+                              (gnc-get-current-root-account)))]
            ;; The list of periods.
            [dates-list (gnc:make-date-interval-list
                         (gnc:timepair-start-day-time from-date-tp)
                         (gnc:timepair-end-day-time to-date-tp)
-                        (gnc:deltasym-to-delta interval))]
-           ;; Circular utility list to detect if an item is the first in the
-           ;; list while mapping without using a state. Hee hee.
-           [is-first-list (let ([l (list #t #f)])
-                            (set-cdr! (last-pair l) (cdr l))
-                            l)])
+                        (gnc:deltasym-to-delta interval))])
+      
       ;; Define functions (some only used once but not lambdas for readability).
+
+      ;; Make a list with the first value being true with the same length
+      ;; as the argument. Use for detecting first element while mapping
+      ;; without using state (circular lists cannot be used with for-each).
+      (define (make-is-first-list ls)
+        (cons #t (make-list (- (length ls) 1) #f)))
 
       (define (reverse-account-values? acct)
         (eqv? (xaccAccountGetType acct) ACCT-TYPE-INCOME))
@@ -270,20 +272,20 @@
                  (let totals-f ([a-depths acct-depths]
                                 [tot-ls totals-below]
                                 [value (gnc-numeric-zero)])
-                   (let ([depth (car a-depths)])
-                     (if (or (null? tot-ls)
-                             (<= depth this-depth))
-                         (construct-totals-data-obj value #f)
-                         (let ((tot (list-ref (car tot-ls) period-i)))
-                           ;; We could use gnc-account-get-parent and compare guid,
-                           ;; but the depth method lets us terminate when we reach
-                           ;; an account on the same level.
-                           (totals-f (cdr a-depths)
-                                     (cdr tot-ls)
-                                     (if (> depth (+ 1 this-depth))
-                                         value
-                                         (numeric-add value
-                                                      (tot 'get-value)))))))))
+                   (if (or (null? tot-ls)
+                           (<= (car a-depths) this-depth))
+                       (construct-totals-data-obj value #f)
+                       (let ([tot (list-ref (car tot-ls) period-i)]
+                             [depth (car a-depths)])
+                         ;; We could use gnc-account-get-parent and compare guid,
+                         ;; but the depth method lets us terminate when we reach
+                         ;; an account on the same level.
+                         (totals-f (cdr a-depths)
+                                   (cdr tot-ls)
+                                   (if (> depth (+ 1 this-depth))
+                                       value
+                                       (numeric-add value
+                                                    (tot 'get-value))))))))
                (iota (length dates-list)))))
 
       ;; Calculate totals. For each account (bottom up): If it's not a
@@ -514,10 +516,17 @@
                               (let* ([result (f (cdr rows)
                                                 (list cur-row))]
                                      [grp (car result)]
-                                     [rows-remain (cdr result)])
-                                ;; Continue.
-                                (f rows-remain
-                                   (append groups (list grp))))])))))])
+                                     [rows-remain (cdr result)]
+                                     [new-groups (append groups (list grp))]
+                                     [new-next-row-depth
+                                      (if (null? rows-remain)
+                                          0
+                                          ((car rows-remain) 'depth))])
+                                ;; Did the sub-group end this group?
+                                ;; Return or continue group.
+                                (if (> cur-row-depth new-next-row-depth)
+                                    (cons new-groups rows-remain)
+                                    (f rows-remain new-groups)))])))))])
 
              ;; Define rendering functions
              (define (format-date d)
