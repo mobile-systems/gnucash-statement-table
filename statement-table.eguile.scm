@@ -1,11 +1,12 @@
 <?scm
 (letrec*
     ([render-acct-row
-      (lambda (a-row is-header)
+      (lambda (a-row id-ls is-header)
 ?>
 <tr class="acct-level-<?scm:d (a-row 'depth)
            ?><?scm (and (a-row 'placeholder?) ?> acct-placeholder<?scm )
-           ?> acct-cat-<?scm:d (a-row 'category-string) ?>">
+           ?> acct-cat-<?scm:d (a-row 'category-string)
+           ?> <?scm:d (id-list->class-str id-ls) ?>">
   <td class="acct-name"><?scm:d (a-row 'name-format) ?></td>
   <?scm (for (total splits) in
              ((a-row 'periods-total-data)
@@ -29,22 +30,15 @@
 </tr>
 <?scm )] ; end [render-row
       [render-group
-       (lambda (group)
+       (lambda (group id-ls)
          ;; The elements in the list may be an account row or a new group.
-         (for (elem is-first) in (group (make-is-first-list group)) do
-              (cond
-               [(list? elem) (render-group elem)]
-               [else
-                (render-acct-row elem is-first)
-                (cond [is-first ; The tbody is after the header element.
-                       ;; .... TODO: find a valid way to to this (we cannot have
-                       ;; nested tbody!)
-?>
-<?scm
-                ])])) ; end (for (elem ...
-         ;; End the group.
-?>
-<?scm )]) ; end let (...
+         (for (elem is-first grp-id) in (group
+                                         (make-is-first-list group)
+                                         (make-id-list group)) do
+              (if (list? elem)
+                  (render-group elem
+                                (cons grp-id id-ls))
+                  (render-acct-row elem id-ls is-first))))]) ; end let (...
 
 ;;; Begin document.
 ?><!DOCTYPE html>
@@ -74,10 +68,11 @@
       </thead>
       <tbody>
       <?scm
-      (for elem in row-groups do
+      (for (elem grp-id) in (row-groups
+                             (make-id-list row-groups)) do
            (if (list? elem)
-               (render-group elem)
-               (render-acct-row elem #f)))
+               (render-group elem (list grp-id))
+               (render-acct-row elem (list grp-id) #f)))
       ?>
       </tbody>
       <tfoot>

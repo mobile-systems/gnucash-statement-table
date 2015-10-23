@@ -528,7 +528,32 @@
                                     (cons new-groups rows-remain)
                                     (f rows-remain new-groups)))])))))])
 
-             ;; Define rendering functions
+             ;; Define rendering functions.
+
+             (define (make-id-list ls)
+               ;; Create a list of ids.
+               ;; The list will be the length of the given list.
+               ;; The ids will be string so that they can be used
+               ;; with string-join.
+               (map (lambda (n)
+                      (number->string (+ 1 n)))
+                    (iota (length ls))))
+
+             (define (id-list->class-str id-list)
+               ;; Create a string with space-separated id-classes.
+               ;; The id-list is deepest level first and the resulting
+               ;; string is "acct-row-grp-<a> acct-row-grp-<a>-<b>" and so on.
+               (string-join
+                (let f ([id-ls id-list]
+                        [ls '()])
+                  (if (null? id-ls)
+                      ls
+                      (f (cdr id-ls)
+                         (cons (string-append "acct-row-grp-"
+                                              (string-join (reverse id-ls)
+                                                           "-"))
+                               ls))))))
+             
              (define (format-date d)
                (gnc-print-date (car d)))
 
