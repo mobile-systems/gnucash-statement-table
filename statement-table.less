@@ -64,15 +64,13 @@ tr.acct-cat-expense {
 }
 
 td.acct-name .acct-grp-button {
-    &:before {
-        display: inline-block;
-        color: hsl(0, 0%, 20%);
-        cursor: pointer;
-    }
-    tr.acct-grp-header-expanded &:before {
-        content: "–";
-    }
-    tr.acct-grp-header-collapsed &:before {
-        content: "+";
+    color: hsl(0, 0%, 20%);
+}
+
+a {
+    color: hsl(0, 0%, 0);
+    text-decoration: none;
+    &:hover {
+        color: hsl(0, 0%, 50%);
     }
 }

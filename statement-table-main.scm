@@ -63,15 +63,17 @@
       (gnc:report-options report-obj) section name)))
 
   ;; Base variables from options.
-  (let ((title (get-option gnc:pagename-general (N_ "Report name")))
-        (base-account (get-option gnc:pagename-accounts optname-base-account))
-        (from-date-tp (gnc:timepair-start-day-time
+  (let ([title (get-option gnc:pagename-general (N_ "Report name"))]
+        [base-account (get-option gnc:pagename-accounts optname-base-account)]
+        [from-date-tp (gnc:timepair-start-day-time
                        (gnc:date-option-absolute-time
-                        (get-option gnc:pagename-general optname-from-date))))
-        (to-date-tp (gnc:timepair-end-day-time
+                        (get-option gnc:pagename-general optname-from-date)))]
+        [to-date-tp (gnc:timepair-end-day-time
                      (gnc:date-option-absolute-time
-                      (get-option gnc:pagename-general optname-to-date))))
-        (interval (get-option gnc:pagename-general optname-stepsize)))
+                      (get-option gnc:pagename-general optname-to-date)))]
+        [interval (get-option gnc:pagename-general optname-stepsize)]
+        [use-links #t]
+        [use-js #t])
     ;; Generated variables.
     (let* ([base-account-guid (gncAccountGetGUID base-account)]
            ;; The list of accounts. Equiety and the base-account plus account
@@ -457,35 +459,43 @@
                                <ls> <ls*> ...)])])
            ;; Build rows.
            (let* ([acct-rows
-                  (filter-map-for-in
-                   ([acct accounts]
-                    [periods-splits-data accounts-periods-splits-data]
-                    [periods-total-data accounts-periods-total-data]
-                    [total accounts-total])
-                   ;; Filter out rows that should not be rendered. We want
-                   ;; as little as possible in the unreadable eguile.
-                   (let ([placeholder? (xaccAccountGetPlaceholder acct)])
-                     (and (or placeholder?
-                              (periods-splits-data 'has-trans?))
-                          (lambda (m)
-                            (case m
-                              [(account)
-                               acct]
-                              [(name-format)
-                               (xaccAccountGetName acct)]
-                              [(category-string)
-                               (symbol->string (account-get-category acct))]
-                              [(depth)
-                               (gnc-account-get-current-depth acct)]
-                              [(placeholder?)
-                               placeholder?]
-                              [(periods-splits)
-                               (periods-splits-data 'get-periods)]
-                              [(periods-total-data)
-                               periods-total-data]
-                              [(total)
-                               total]
-                              [else (error "Invalid method!")])))))]
+                   (filter-map-for-in
+                    ([acct accounts]
+                     [periods-splits-data accounts-periods-splits-data]
+                     [periods-total-data accounts-periods-total-data]
+                     [total accounts-total])
+                    ;; Filter out rows that should not be rendered. We want
+                    ;; as little as possible in the unreadable eguile.
+                    (let ([placeholder? (xaccAccountGetPlaceholder acct)])
+                      (and (or placeholder?
+                               (periods-splits-data 'has-trans?))
+                           (lambda (m)
+                             (case m
+                               [(account)
+                                acct]
+                               [(name-format)
+                                (if (and use-links
+                                         (not placeholder?))
+                                    (string-append
+                                     "<a href=\"gnc-register:acct-guid="
+                                     (gncAccountGetGUID acct)
+                                     "\">"
+                                     (xaccAccountGetName acct)
+                                     "</a>")
+                                    (xaccAccountGetName acct))]
+                               [(category-string)
+                                (symbol->string (account-get-category acct))]
+                               [(depth)
+                                (gnc-account-get-current-depth acct)]
+                               [(placeholder?)
+                                placeholder?]
+                               [(periods-splits)
+                                (periods-splits-data 'get-periods)]
+                               [(periods-total-data)
+                                periods-total-data]
+                               [(total)
+                                total]
+                               [else (error "Invalid method!")])))))]
                   [row-groups
                    (car
                     (let f ([rows acct-rows]

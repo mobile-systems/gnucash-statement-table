@@ -100,9 +100,11 @@
         </tr>
       </tfoot>
     </table>
+    <?scm (if use-js (begin ?>
     <script src="<?scm:d (gnc-path-find-localized-html-file
                           "jqplot/jquery.min.js") ?>"></script>
     <script src="<?scm:d (find-file "statement-table.js") ?>"></script>
+    <?scm )) ?>
   </body>
 </html>
 <?scm ) ?>
