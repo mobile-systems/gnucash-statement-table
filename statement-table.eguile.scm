@@ -4,10 +4,14 @@
       (lambda (a-row id-ls is-header)
 ?>
 <tr class="acct-level-<?scm:d (a-row 'depth)
-           ?><?scm (and (a-row 'placeholder?) ?> acct-placeholder<?scm )
+           ?><?scm (if (a-row 'placeholder?) ?> acct-placeholder<?scm )
            ?> acct-cat-<?scm:d (a-row 'category-string)
-           ?> <?scm:d (id-list->class-str id-ls) ?>">
-  <td class="acct-name"><?scm:d (a-row 'name-format) ?></td>
+           ?> <?scm:d (id-list->class-str id-ls)
+           ?><?scm (if is-header ?> acct-grp-header<?scm )
+           ?>" data-acct-grp-ids="<?scm:d (string-join id-ls) ?>">
+  <td class="acct-name">
+    <?scm:d (a-row 'name-format) ?>
+  </td>
   <?scm (for (total splits) in
              ((a-row 'periods-total-data)
               (a-row 'periods-splits)) do ?>
@@ -96,6 +100,9 @@
         </tr>
       </tfoot>
     </table>
+    <script src="<?scm:d (gnc-path-find-localized-html-file
+                          "jqplot/jquery.min.js") ?>"></script>
+    <script src="<?scm:d (find-file "statement-table.js") ?>"></script>
   </body>
 </html>
 <?scm ) ?>

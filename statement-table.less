@@ -62,3 +62,17 @@ tr.acct-cat-expense {
 .splits {
     display: none;
 }
+
+td.acct-name .acct-grp-button {
+    &:before {
+        display: inline-block;
+        color: hsl(0, 0%, 20%);
+        cursor: pointer;
+    }
+    tr.acct-grp-header-expanded &:before {
+        content: "–";
+    }
+    tr.acct-grp-header-collapsed &:before {
+        content: "+";
+    }
+}

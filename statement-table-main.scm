@@ -3,6 +3,7 @@
 (use-modules (srfi srfi-1))
 
 (use-modules (gnucash main))
+(use-modules (gnucash core-utils))
 (use-modules (gnucash gnc-module))
 (use-modules (gnucash gettext))
 (use-modules (gnucash report eguile-gnc))
@@ -542,14 +543,14 @@
              (define (id-list->class-str id-list)
                ;; Create a string with space-separated id-classes.
                ;; The id-list is deepest level first and the resulting
-               ;; string is "acct-row-grp-<a> acct-row-grp-<a>-<b>" and so on.
+               ;; string is "acct-grp-id-<a> acct-grp-id-<a>-<b>" and so on.
                (string-join
                 (let f ([id-ls id-list]
                         [ls '()])
                   (if (null? id-ls)
                       ls
                       (f (cdr id-ls)
-                         (cons (string-append "acct-row-grp-"
+                         (cons (string-append "acct-grp-id-"
                                               (string-join (reverse id-ls)
                                                            "-"))
                                ls))))))
