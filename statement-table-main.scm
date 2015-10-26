@@ -217,13 +217,19 @@
                      (or has-trans (not (null? splits)))
                      (cons splits ls)))))))
 
-      ;; Add numbers using settings maintaining an accurate result.
-      ;; Helper for calculating totals.
+      ;; Add numbers using settings that maintains an accurate result.
+      ;; (cf. GnuCash wiki).
       (define (numeric-add v1 v2)
         ;; TODO: replace with currency aware wrapper
         (gnc-numeric-add v1 v2
                          GNC-DENOM-AUTO
-                         GNC-DENOM-LCD))
+                         (+ GNC-DENOM-REDUCE GNC-RND-NEVER)))
+
+      (define (numeric-div v1 v2)
+        ;; Cf. numeric-add.
+        (gnc-numeric-div v1 v2
+                         GNC-DENOM-AUTO
+                         (+ GNC-DENOM-REDUCE GNC-RND-NEVER)))
 
       ;; Construct an object with data for totals.
       ;; Helper function.
@@ -335,6 +341,10 @@
               (gnc-numeric-zero)
               periods-total-data))
 
+      (define (whole-period-average total)
+        (numeric-div total
+                     (gnc-numeric-create (length dates-list) 1)))
+
       (define (get-periods-totals accts-periods-total-data)
         ;; Get three lists with a total for each period and a sum.
         ;; Totals are three values:
@@ -388,16 +398,22 @@
                                   (reduce numeric-add
                                           (gnc-numeric-zero)
                                           tot-ls))
-                                periods-totals)])
+                                periods-totals)]
+               [averages (map (lambda (tot)
+                                (whole-period-average tot))
+                              all-totals)])
           ;; Create the final lists.
           (let ([total
                  (append (car periods-totals)
+                         (list (car averages))
                          (list (car all-totals)))]
                 [total-min-asset
                  (append (cadr periods-totals)
+                         (list (cadr averages))
                          (list (cadr all-totals)))]
                 [total-min-asset-liab
                  (append (caddr periods-totals)
+                         (list (caddr averages))
                          (list (caddr all-totals)))])
             ;; Return an "object" instead of a list.
             (lambda (m)
@@ -439,6 +455,7 @@
           [accounts-periods-total-data (get-accounts-periods-total-data
                                         accounts-periods-splits-data)]
           [accounts-total << get-account-total : accounts-periods-total-data]
+          [accounts-average << whole-period-average : accounts-total]
           [periods-totals (get-periods-totals accounts-periods-total-data)])
          ;; Ready to render ... or no, local-eval does not support
          ;; macros (cf. comment on analyze-identifiers in ice9/local-eval.scm).
@@ -463,6 +480,7 @@
                     ([acct accounts]
                      [periods-splits-data accounts-periods-splits-data]
                      [periods-total-data accounts-periods-total-data]
+                     [average accounts-average]
                      [total accounts-total])
                     ;; Filter out rows that should not be rendered. We want
                     ;; as little as possible in the unreadable eguile.
@@ -493,6 +511,8 @@
                                 (periods-splits-data 'get-periods)]
                                [(periods-total-data)
                                 periods-total-data]
+                               [(average)
+                                average]
                                [(total)
                                 total]
                                [else (error "Invalid method!")])))))]
@@ -573,7 +593,10 @@
                (let ([val (if reverse
                               (gnc-numeric-neg value)
                               value)])
-                 (xaccPrintAmount val
+                 (xaccPrintAmount (gnc-numeric-convert val
+                                                       100
+                                                       (+ GNC-DENOM-REDUCE
+                                                          GNC-RND-ROUND))
                                   (gnc-default-print-info #f))))
 
              ;; Format number, using account to determine wether to change sign.

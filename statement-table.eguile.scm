@@ -17,6 +17,7 @@
               (a-row 'periods-splits)) do ?>
   <td>
     <?scm:d (format-acct-number (total 'get-value) (a-row 'account)) ?>
+    <?scm (if (not (null? splits)) ?>
     <div class="splits">
       <?scm (for split in splits do ?>
       <div>
@@ -24,12 +25,13 @@
         :
         <?scm:d (xaccAccountGetName (xaccSplitGetAccount split)) ?>
       </div>
-      <?scm ) ; end (for split ...
+      <?scm )) ; end (if (not (null? splits))
       ?>
     </div>
   </td>
   <?scm ) ; end (for (total ...
   ?>
+  <td><?scm:d (format-acct-number (a-row 'average) (a-row 'account)) ?></td>
   <td><?scm:d (format-acct-number (a-row 'total) (a-row 'account)) ?></td>
 </tr>
 <?scm )] ; end [render-row
@@ -67,6 +69,7 @@
           <?scm (for d in dates-list do ?>
           <th><?scm:d (format-date d) ?></th>
           <?scm ) ?>
+          <th><?scm:d (_ "Average") ?></th>
           <th><?scm:d (_ "Total") ?></th>
         </tr>
       </thead>
