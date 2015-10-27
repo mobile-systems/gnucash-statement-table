@@ -16,18 +16,21 @@
              ((a-row 'periods-total-data)
               (a-row 'periods-splits)) do ?>
   <td>
-    <?scm:d (format-acct-number (total 'get-value) (a-row 'account)) ?>
-    <?scm (if (not (null? splits)) ?>
-    <div class="splits">
+    <span class="acct-total">
+      <?scm:d (format-acct-number (total 'get-value) (a-row 'account)) ?>
+    </span>
+    <?scm (if (not (null? splits)) (begin ?>
+    <table class="splits">
       <?scm (for split in splits do ?>
-      <div>
-        <?scm:d (xaccTransGetDescription (xaccSplitGetParent split)) ?>
-        :
-        <?scm:d (xaccAccountGetName (xaccSplitGetAccount split)) ?>
-      </div>
-      <?scm )) ; end (if (not (null? splits))
-      ?>
-    </div>
+      <tr>
+        <td><?scm:d (xaccTransGetDescription (xaccSplitGetParent split)) ?></td>
+        <td><?scm:d (format-acct-number (xaccSplitGetValue split)
+                                        (a-row 'account)) ?></td>
+      </tr>
+      <?scm ) ?>
+    </table>
+    <?scm )) ; end (if (not (null? splits)) ...
+    ?>
   </td>
   <?scm ) ; end (for (total ...
   ?>
