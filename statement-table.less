@@ -2,6 +2,7 @@
 @lighten-level: 20%;
 @bgcolor-alternate: 7%;
 @acct-levels: 6;
+@border-color: hsl(0, 0%, 20%);
 
 .make-acct-type(@bgcolor) {
     .acct-level-color(@l) when (@l > 0) {
@@ -32,45 +33,61 @@ body {
     font-size: 14px;
 }
 
-table {
-    border-collapse: collapse;
-}
-
-td, th {
-    text-align: left;
-    vertical-align: top;
-    padding: 1px 5px;
-}
-
-tr.acct-placeholder {
-  font-weight: bold;
-}
-
-tr.acct-cat-asset {
-    .make-acct-type(hsl(240, 20%, 45%));
-}
-tr.acct-cat-liability {
-    .make-acct-type(hsl(60, 70%, 30%));
-}
-tr.acct-cat-income {
-    .make-acct-type(hsl(120, 60%, 30%));
-}
-tr.acct-cat-expense {
-    .make-acct-type(hsl(0, 20%, 30%));
-}
-
-.splits {
-    display: none;
-}
-
-td.acct-name .acct-grp-button {
-    color: hsl(0, 0%, 20%);
-}
-
 a {
     color: hsl(0, 0%, 0);
     text-decoration: none;
     &:hover {
         color: hsl(0, 0%, 50%);
     }
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table.main-table {
+
+    .col-average {
+        border-left: 1px solid @border-color;
+    }
+
+    td, th {
+        text-align: right;
+        vertical-align: top;
+        padding: 1px 5px;
+    }
+
+    td:first-child {
+        text-align: left; // Does not work for colgroup.
+    }
+
+    td.acct-name .acct-grp-button {
+        color: hsl(0, 0%, 20%);
+    }
+
+    tr.acct-placeholder {
+        font-weight: bold;
+    }
+
+    tr.acct-cat-asset {
+        .make-acct-type(hsl(240, 20%, 45%));
+    }
+    tr.acct-cat-liability {
+        .make-acct-type(hsl(60, 70%, 30%));
+    }
+    tr.acct-cat-income {
+        .make-acct-type(hsl(120, 60%, 30%));
+    }
+    tr.acct-cat-expense {
+        .make-acct-type(hsl(0, 20%, 30%));
+    }
+
+    .splits {
+        display: none;
+    }
+
+    tfoot  {
+        border-top: 1px solid @border-color;
+    }
+
 }

@@ -62,7 +62,13 @@
       <?scm:d (_ "to") ?>
       <?scm:d (gnc-print-date to-date-tp) ?>
     </h1>
-    <table>
+    <table class="main-table">
+      <colgroup>
+        <col class="col-account-names"/>
+        <col class="col-periods" span="<?scm:d (length dates-list) ?>"/>
+        <col class="col-average"/>
+        <col class="col-total"/>
+      </colgroup>
       <thead>
         <tr>
           <th></th>
