@@ -1,9 +1,6 @@
 "use strict";
 
 (function($) {
-    var hideText = "–";
-    var showText = "+";
-    
     /*
      * Crude expand/collapse function.
      * Table rows are not easily animated and cannot be hierarchically
@@ -11,8 +8,10 @@
      * Thus, the grouping is based on a hiearchic set of ids and classes
      * and no animation is used.
      */
-    $(function() {
-        var button = $("<a href='#'/>") // GnuCash does not respect CSS cursor.
+    function initAccordions() {
+        var hideText = "–";
+        var showText = "+";
+        var $button = $("<span/>")
             .attr("role", "button")
             .attr("tabindex", "0")
             .addClass("acct-grp-button")
@@ -20,7 +19,7 @@
         $("tr.acct-grp-header")
             .addClass("acct-grp-header-expanded")
             .children("td.acct-name")
-            .prepend(button);
+            .prepend($button);
         $(".acct-grp-button")
             .click(function() {
                 var $this = $(this);
@@ -46,5 +45,27 @@
                 }
                 return false;
             });
+    }
+
+    /**
+     * Create show splits dropdown.
+     */
+    function initShowSplits() {
+        $('.has-splits .total').click(function() {
+            var $splits = $(this).next('.splits');
+            if ($splits.hasClass('hidden')) {
+                $('.splits:not(.hidden)').addClass('hidden');
+                $splits.removeClass('hidden');
+                $openSplits = $splits;
+            } else {
+                $splits.addClass('hidden');
+            }
+            return false;
+        });
+    }
+
+    $(function() {
+        initAccordions();
+        initShowSplits();
     });
 })(jQuery);

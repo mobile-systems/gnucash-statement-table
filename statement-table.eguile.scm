@@ -15,17 +15,26 @@
   <?scm (for (total splits) in
              ((a-row 'periods-total-data)
               (a-row 'periods-splits)) do ?>
-  <td>
-    <span class="acct-total">
+  <td<?scm (if (and use-js (not (null? splits))) ?> class="has-splits"<?scm ) ?>>
+    <span class="total">
       <?scm:d (format-acct-number (total 'get-value) (a-row 'account)) ?>
     </span>
-    <?scm (if (not (null? splits)) (begin ?>
-    <table class="splits">
+    <?scm (if (and use-js (not (null? splits))) (begin ?>
+    <table class="splits hidden">
       <?scm (for split in splits do ?>
       <tr>
-        <td><?scm:d (xaccTransGetDescription (xaccSplitGetParent split)) ?></td>
-        <td><?scm:d (format-acct-number (xaccSplitGetValue split)
-                                        (a-row 'account)) ?></td>
+        <td class="split-date">
+          <?scm:d (gnc-print-date
+                    (gnc:secs->timepair
+                      (xaccTransGetDate (xaccSplitGetParent split)))) ?>
+        </td>
+        <td class="split-description">
+          <?scm:d (format-split-description split) ?>
+        </td>
+        <td class="split-value">
+          <?scm:d (format-acct-number (xaccSplitGetValue split)
+                                      (a-row 'account)) ?>
+        </td>
       </tr>
       <?scm ) ?>
     </table>
@@ -76,7 +85,7 @@
         <tr>
           <th></th>
           <?scm (for d in dates-list do ?>
-          <th><?scm:d (format-date d) ?></th>
+          <th class="header-date"><?scm:d (format-date d) ?></th>
           <?scm ) ?>
           <th><?scm:d (_ "Average") ?></th>
           <th><?scm:d (_ "Total") ?></th>
@@ -112,6 +121,7 @@
         </tr>
       </tfoot>
     </table>
+
     <?scm (if use-js (begin ?>
     <script src="<?scm:d (gnc-path-find-localized-html-file
                           "jqplot/jquery.min.js") ?>"></script>

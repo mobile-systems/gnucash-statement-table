@@ -190,7 +190,10 @@
                     (query (qof-query-create-for-splits)))
                 (qof-query-set-book query book)
                 (gnc:query-set-match-non-voids-only! query book)
-                ;; (qof-query-set-sort-order query dato num '())
+                (qof-query-set-sort-order query
+                                          (list SPLIT-TRANS TRANS-DATE-POSTED)
+                                          (list SPLIT-TRANS TRANS-NUM)
+                                          '())
                 ;; The comment in Query.h indicates the that the qof_*
                 ;; are the new API and the xaccQuery* are the old. However,
                 ;; the "new" lacks the convenience functions. The whole
@@ -584,6 +587,17 @@
                                               (string-join (reverse id-ls)
                                                            "-"))
                                ls))))))
+
+             (define (format-split-description split)
+               (let ([desc (xaccTransGetDescription (xaccSplitGetParent split))])
+                 (if use-links
+                     (string-append
+                      "<a href=\"gnc-register:split-guid="
+                      (gncSplitGetGUID split)
+                      "\">"
+                      desc
+                      "</a>")
+                     desc)))
              
              (define (format-date d)
                (gnc-print-date (car d)))

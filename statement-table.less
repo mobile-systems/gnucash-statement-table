@@ -3,6 +3,7 @@
 @bgcolor-alternate: 7%;
 @acct-levels: 6;
 @border-color: hsl(0, 0%, 20%);
+@cellPadding: 1px 5px;
 
 .make-acct-type(@bgcolor) {
     .acct-level-color(@l) when (@l > 0) {
@@ -31,6 +32,7 @@
 
 body {
     font-size: 14px;
+    box-sizing: border-box;
 }
 
 a {
@@ -45,6 +47,10 @@ table {
     border-collapse: collapse;
 }
 
+.hidden {
+    display: none;
+}
+
 table.main-table {
 
     .col-average {
@@ -54,15 +60,16 @@ table.main-table {
     td, th {
         text-align: right;
         vertical-align: top;
-        padding: 1px 5px;
+        padding: @cellPadding;
     }
 
     td:first-child {
         text-align: left; // Does not work for colgroup.
     }
 
-    td.acct-name .acct-grp-button {
+    .acct-grp-button {
         color: hsl(0, 0%, 20%);
+        cursor: pointer;
     }
 
     tr.acct-placeholder {
@@ -82,12 +89,46 @@ table.main-table {
         .make-acct-type(hsl(0, 20%, 30%));
     }
 
-    .splits {
-        display: none;
+    td.has-splits {
+        cursor: pointer;
+        position: relative;
+        padding: 0;
+
+        .total {
+            display: block;
+            padding: @cellPadding;
+            &:hover {
+                background-color: hsl(0, 0%, 80%);
+            }
+        }
     }
 
     tfoot  {
         border-top: 1px solid @border-color;
     }
 
+}
+
+table.splits {
+    position: absolute;
+    z-index: 999;
+    top: 100%;
+    left: 0;
+    width: 450px;
+    border: 1px solid @border-color;
+    cursor: initial;
+    
+    td {
+        text-align: left;
+    }
+    td.split-value {
+        text-align: right;
+    }
+    
+    tr:nth-of-type(odd) {
+        background-color: hsl(160, 80%, 80%);
+    }
+    tr:nth-of-type(even) {
+        background-color: hsl(160, 80%, 90%);
+    }
 }
