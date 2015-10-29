@@ -477,6 +477,18 @@
                           (filter-map (lambda (<var> <var*> ...)
                                  <e> <e*> ...)
                                <ls> <ls*> ...)])])
+           (define (html-escape-string str)
+             (list->string (fold (lambda (c ls)
+                                   (let ([x (case c
+                                              [(#\<) "&lt;"]
+                                              [(#\>) "&gt;"]
+                                              [(#\") "&quot;"]
+                                              [(#\&) "&amp"]
+                                              [else (string c)])])
+                                     (append ls (string->list x))))
+                                 '()
+                                 (string->list str))))
+           
            ;; Build rows.
            (let* ([acct-rows
                    (filter-map-for-in
@@ -495,15 +507,17 @@
                                [(account)
                                 acct]
                                [(name-format)
-                                (if (and use-links
-                                         (not placeholder?))
-                                    (string-append
-                                     "<a href=\"gnc-register:acct-guid="
-                                     (gncAccountGetGUID acct)
-                                     "\">"
-                                     (xaccAccountGetName acct)
-                                     "</a>")
-                                    (xaccAccountGetName acct))]
+                                (let ([name-str (html-escape-string
+                                                 (xaccAccountGetName acct))])
+                                  (if (and use-links
+                                           (not placeholder?))
+                                      (string-append
+                                       "<a href=\"gnc-register:acct-guid="
+                                       (gncAccountGetGUID acct)
+                                       "\">"
+                                       name-str
+                                       "</a>")
+                                      name-str))]
                                [(category-string)
                                 (symbol->string (account-get-category acct))]
                                [(depth)
@@ -618,7 +632,7 @@
                ;; TODO: like transaction.scm, account-types-to-reverse
                (format-number value
                               (reverse-account-values? acct)))
-             
+
              ;; Render
              (eguile-file-to-string
               (find-file "statement-table.eguile.scm")

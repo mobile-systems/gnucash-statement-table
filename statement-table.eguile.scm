@@ -21,22 +21,32 @@
     </span>
     <?scm (if (and use-js (not (null? splits))) (begin ?>
     <table class="splits hidden">
-      <?scm (for split in splits do ?>
-      <tr>
+      <?scm (for split in splits do
+              (let* ([trans (xaccSplitGetParent split)]
+                     [notes (xaccTransGetNotes trans)]
+                     [has-notes (not (equal? notes ""))]) ?>
+      <tr<?scm (if has-notes (begin ?> title="<?scm:d
+              (html-escape-string notes) ?>"<?scm )) ?>>
         <td class="split-date">
           <?scm:d (gnc-print-date
                     (gnc:secs->timepair
-                      (xaccTransGetDate (xaccSplitGetParent split)))) ?>
+                      (xaccTransGetDate trans))) ?>
         </td>
         <td class="split-description">
           <?scm:d (format-split-description split) ?>
+          <?scm (if has-notes (begin ?>
+          <span class="split-info-symbol">
+            &#x2004;&#x2139;&#x20DD;&#x2004;
+          </span>
+          <?scm )) ?>
         </td>
         <td class="split-value">
           <?scm:d (format-acct-number (xaccSplitGetValue split)
                                       (a-row 'account)) ?>
         </td>
       </tr>
-      <?scm ) ?>
+      <?scm )) ; end (for split in ...
+      ?>
     </table>
     <?scm )) ; end (if (not (null? splits)) ...
     ?>
