@@ -602,16 +602,36 @@
                                                            "-"))
                                ls))))))
 
+             (define (split-get-formatted-notes-string split)
+               (html-escape-string (xaccTransGetNotes
+                                    (xaccSplitGetParent split))))
+             
+             (define (format-split-string split str)
+               (if use-links
+                   (string-append
+                    "<a href=\"gnc-register:split-guid="
+                    (gncSplitGetGUID split)
+                    "\">"
+                    str
+                    "</a>")
+                   str))
+
+             (define (format-split-date split)
+               (format-split-string split
+                                    (gnc-print-date
+                                     (gnc:secs->timepair
+                                      (xaccTransGetDate
+                                       (xaccSplitGetParent split))))))
+             
              (define (format-split-description split)
-               (let ([desc (xaccTransGetDescription (xaccSplitGetParent split))])
-                 (if use-links
-                     (string-append
-                      "<a href=\"gnc-register:split-guid="
-                      (gncSplitGetGUID split)
-                      "\">"
-                      desc
-                      "</a>")
-                     desc)))
+               (format-split-string split
+                                    (xaccTransGetDescription
+                                     (xaccSplitGetParent split))))
+
+             (define (format-split-value split acct)
+               (format-split-string split
+                                    (format-acct-number
+                                     (xaccSplitGetValue split) acct)))
              
              (define (format-date d)
                (gnc-print-date (car d)))

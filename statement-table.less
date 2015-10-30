@@ -3,7 +3,10 @@
 @bgcolor-alternate: 7%;
 @acct-levels: 6;
 @border-color: hsl(0, 0%, 20%);
-@cellPadding: 1px 5px;
+@a-color: hsl(0, 0%, 0);
+@a-hover-color: hsl(0, 0%, 50%);
+@cell-hover-bg-color: hsl(0, 0%, 80%);
+@cell-padding: 1px 5px;
 
 .make-acct-type(@bgcolor) {
     .acct-level-color(@l) when (@l > 0) {
@@ -36,10 +39,10 @@ body {
 }
 
 a {
-    color: hsl(0, 0%, 0);
+    color: @a-color;
     text-decoration: none;
     &:hover {
-        color: hsl(0, 0%, 50%);
+        color: @a-hover-color;
     }
 }
 
@@ -60,7 +63,7 @@ table.main-table {
     td, th {
         text-align: right;
         vertical-align: top;
-        padding: @cellPadding;
+        padding: @cell-padding;
     }
 
     td:first-child {
@@ -96,7 +99,7 @@ table.main-table {
 
         .total {
             display: block;
-            padding: @cellPadding;
+            padding: @cell-padding;
             &:hover {
                 background-color: hsl(0, 0%, 80%);
             }
@@ -117,12 +120,33 @@ table.splits {
     width: 600px;
     border: 1px solid @border-color;
     cursor: initial;
-    
+
     td {
+        padding: 0;
         text-align: left;
+        a {
+            display: block;
+            padding: @cell-padding;
+            &:hover {
+                color: @a-color;
+            }
+        }
     }
     td.split-value {
         text-align: right;
+    }
+
+    tr.has-notes td.split-description a:after {
+        float: right;
+        /* Information i with enclosing circle.
+           Surrounded by thick space to get a full circle instead of just some
+           lines over and under the i. The combining character only gets the
+           with of the combined glyph (because it's zero width?). */
+        content: "\2004\2139\20DD\2004";
+    }
+
+    tr:hover td {
+        background-color: @cell-hover-bg-color;
     }
     
     tr:nth-of-type(odd) {
