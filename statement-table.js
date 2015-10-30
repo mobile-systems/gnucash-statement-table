@@ -51,16 +51,24 @@
      * Create show splits dropdown.
      */
     function initShowSplits() {
-        $('.has-splits .total').click(function() {
-            var $splits = $(this).next('.splits');
-            if ($splits.hasClass('hidden')) {
-                $('.splits:not(.hidden)').addClass('hidden');
-                $splits.removeClass('hidden');
-                $openSplits = $splits;
-            } else {
-                $splits.addClass('hidden');
+        $(".has-splits .total").click(function() {
+            var $this = $(this);
+            var $splits = $this.next(".splits");
+            if ($splits.hasClass("hidden")) {
+                $(".splits:not(.hidden)").addClass("hidden");
+                $splits.removeClass("hidden");
+                
+                // The next click closes the dropdown. If it's inside
+                // the table, a link would have been clicked.
+                $(window).one("click", function(event) {
+                    $splits.addClass("hidden");
+                });
+
+                // Do no further if we show the splits table.
+                // If the condition was false, the click will propagate
+                // to the click handler on window.
+                return false;
             }
-            return false;
         });
     }
 
