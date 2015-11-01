@@ -53,20 +53,30 @@
     function initShowSplits() {
         $(".has-splits .total").click(function() {
             var $this = $(this);
-            var $splits = $this.next(".splits");
-            if ($splits.hasClass("hidden")) {
+            if (!$this.hasClass('splits-active')) {
+                var $splits = $this.next(".splits");
+                var $cellPos = $this.parent('td').offset();
+                var $cellHeight = $this.outerHeight();
+                var $splitsContainer = $('<div/>')
+                    .addClass('splitsContainer')
+                    .offset({
+                        left: $cellPos.left,
+                        top: $cellPos.top + $cellHeight
+                    })
+                    .append($splits.clone().show());
+
                 $(".splits-active").removeClass("splits-active");
                 $this.addClass("splits-active");
 
-                $(".splits:not(.hidden)").addClass("hidden");
-                $splits.removeClass("hidden");
+                $('.splitsContainer').remove();
+                $splitsContainer.appendTo('body');
                 
                 $(window).off("click.splits");
                 // The next click closes the dropdown. If it's inside
                 // the table, a link would have been clicked.
                 $(window).one("click.splits", function(event) {
                     $this.removeClass("splits-active");
-                    $splits.addClass("hidden");
+                    $splitsContainer.remove();
                 });
 
                 // Do no further if we show the splits table.
