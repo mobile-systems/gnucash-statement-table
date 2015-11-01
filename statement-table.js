@@ -55,12 +55,17 @@
             var $this = $(this);
             var $splits = $this.next(".splits");
             if ($splits.hasClass("hidden")) {
+                $(".splits-active").removeClass("splits-active");
+                $this.addClass("splits-active");
+
                 $(".splits:not(.hidden)").addClass("hidden");
                 $splits.removeClass("hidden");
                 
+                $(window).off("click.splits");
                 // The next click closes the dropdown. If it's inside
                 // the table, a link would have been clicked.
-                $(window).one("click", function(event) {
+                $(window).one("click.splits", function(event) {
+                    $this.removeClass("splits-active");
                     $splits.addClass("hidden");
                 });
 
