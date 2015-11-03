@@ -64,7 +64,7 @@
   <head>
     <meta charset="utf-8">
     <title><?scm:d title ?></title>
-    <link rel="shylesheet" href="<?scm:d (find-file "normalize.css") ?>">
+    <link rel="stylesheet" href="<?scm:d (find-file "normalize.css") ?>">
     <link rel="stylesheet" href="<?scm:d (find-file "statement-table.css") ?>">
   </head>
   <body>
