@@ -48,6 +48,8 @@ table after restarting GnuCash.
 
 [GPLv2](https://www.gnu.org/licenses/gpl-2.0.html), like GnuCash.
 
+Except from normalize.css, which is under MIT License.
+
 
 ## No warranty
 
