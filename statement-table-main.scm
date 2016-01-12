@@ -32,7 +32,33 @@
     (add-option! (gnc:make-account-sel-limited-option
                   gnc:pagename-accounts optname-base-account
                   "a" opthelp-base-account
-                  #f #f
+                  (lambda ()
+                    ;; Default getter inspired from the default find-first-account.
+                    ;; The default is the most active bank account.
+                    (let find-most-active-bank-account
+                        ([best-acct '()]
+                         [best-split-count 0]
+                         [account-list (gnc-account-get-descendants
+                                        (gnc-get-current-root-account))])
+                      (if (null? account-list)
+                          ;; Evaluate to best account.
+                          best-acct
+                          ;; Try next account.
+                          (let* ([acct (car account-list)]
+                                 [is-bank-acct (equal?
+                                                (xaccAccountGetType acct)
+                                                ACCT-TYPE-BANK)]
+                                 [split-count (if is-bank-acct
+                                                  (length (xaccAccountGetSplitList
+                                                           acct))
+                                                  -1)]
+                                 [this-is-better (> split-count best-split-count)])
+                            ;; Tail call with new best account or current best.
+                            (find-most-active-bank-account
+                             (if this-is-better acct best-acct)
+                             (if this-is-better split-count best-split-count)
+                             (cdr account-list))))))
+                  #f
                   (list ACCT-TYPE-BANK)))
     ;; (add-option! (gnc:make-account-list-option
     ;;               gnc:pagename-accounts optname-accounts
