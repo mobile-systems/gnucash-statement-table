@@ -15,7 +15,11 @@
   <?scm (for (total splits) in
              ((a-row 'periods-total-data)
               (a-row 'periods-splits)) do ?>
-  <td<?scm (if (and use-js (not (null? splits))) ?> class="has-splits"<?scm ) ?>>
+  <td<?scm (if (and use-js (not (null? splits)))
+               ?> class="has-splits"<?scm
+               (if (and (null? splits) (not (a-row 'placeholder?)))
+                   ?> class="zero"<?scm
+           )) ?>>
     <span class="total">
       <?scm:d (format-acct-number (total 'get-value) (a-row 'account)) ?>
     </span>
