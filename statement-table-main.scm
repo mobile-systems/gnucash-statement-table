@@ -13,12 +13,15 @@
 
 (define optname-base-account (N_ "Base account"))
 (define opthelp-base-account (N_ "Base bank account"))
-(define optname-accounts (N_ "Show accounts"))
 (define opthelp-accounts
   (N_ "Report on these accounts, if display depth allows. Else, amount is shown in \"Other\"."))
 (define optname-depth-limit (N_ "Levels of Subaccounts"))
 (define opthelp-depth-limit
   (N_ "Maximum number of levels in the account tree displayed."))
+(define optname-use-js (N_ "Use JavaScript"))
+(define opthelp-use-js
+  (N_ "Makes account groups collapsible and allows browsing splits."))
+(define optname-show-account-description (N_ "Show account description"))
 (define optname-from-date (N_ "Start Date"))
 (define optname-to-date (N_ "End Date"))
 (define optname-stepsize (N_ "Step Size"))
@@ -60,6 +63,13 @@
                              (cdr account-list))))))
                   #f
                   (list ACCT-TYPE-BANK)))
+
+    ;; Display
+    (add-option! (gnc:make-simple-boolean-option
+                  gnc:pagename-display optname-use-js
+                  "a" opthelp-use-js
+                  #t))
+    
     ;; (add-option! (gnc:make-account-list-option
     ;;               gnc:pagename-accounts optname-accounts
     ;;               "b" opthelp-accounts
@@ -99,7 +109,7 @@
                       (get-option gnc:pagename-general optname-to-date)))]
         [interval (get-option gnc:pagename-general optname-stepsize)]
         [use-links #t]
-        [use-js #t])
+        [use-js (get-option gnc:pagename-display optname-use-js)])
     ;; Generated variables.
     (let* ([base-account-guid (gncAccountGetGUID base-account)]
            ;; The list of accounts. Equiety and the base-account plus account
